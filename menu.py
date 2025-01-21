@@ -19,7 +19,7 @@ class Menu():
         pygame.display.update()
 
     def draw_menu_background(self):
-        background_surface = pygame.Surface((720,720))
+        background_surface = pygame.Surface((750,750))
         background_surface.fill((0,0,0))
         background_surface.set_alpha(200)
         self.game.display.blit(background_surface, (280, 0))
@@ -92,7 +92,7 @@ class Instruction(Menu):
                     self.run_display = False
 
     def draw_menu_background(self):
-        background_surface = pygame.Surface((720,720))
+        background_surface = pygame.Surface((750,750))
         background_surface.fill((0,0,0))
         background_surface.set_alpha(200)
 
@@ -132,7 +132,7 @@ class Options(Menu):
                     self.run_display = False
 
     def draw_menu_background(self):
-        background_surface = pygame.Surface((720,720))
+        background_surface = pygame.Surface((750,750))
         background_surface.fill((0,0,0))
         background_surface.set_alpha(200)
 
