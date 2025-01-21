@@ -1,2 +1,2 @@
 # Projekt-PJF
-Projekt na przedmio Podstawy Języków Funkcyjnych
+Projekt na przedmiot Podstawy Języków Funkcyjnych
