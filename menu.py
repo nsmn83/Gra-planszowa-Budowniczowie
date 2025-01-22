@@ -2,7 +2,6 @@ import pygame
 
 import game
 
-
 class Menu():
     def __init__(self, game):
         self.instrukcja_rect = None
