@@ -1,6 +1,7 @@
 import pygame
 from menu import MainMenu
-from stanGry import stanGry, Tura
+from stanGry import stanGry
+from tura import Tura
 
 
 class Game():
@@ -50,24 +51,21 @@ class Game():
                 if self.stanGry.aktualnyPionek is None:
                     #obliczenie pola planszy na podstawie wcisnietego kwadratu
                     self.stanGry.aktualnyPionek = self.sprawdzPoprawnoscWyboru(x,y)
-                    if self.stanGry.aktualnyPionek:
-                        print("Sprawdzenie ruchow wybranego pionka")
-                        self.stanGry.aktualnyPionek.sprawdzRuchy(self.stanGry)  # Check for valid moves
-                        self.draw_menu_background()
-                        self.window.blit(self.display, (0, 0))
-                        pygame.display.update()
-                        self.blit_screen()
-                        if(self.stanGry.tura == Tura.RUCH):
-                            print("Tura Ruch 1")
-                elif self.stanGry.tura == Tura.RUCH:
-                    print("Tura ruch")
-                    self.stanGry.aktualnyPionek.wykonajRuch(x,y,self.stanGry)
-                elif self.stanGry.tura == Tura.BUDUJ:
-                    self.stanGry.aktualnyPionek.zbudujPietro(x,y,self.stanGry)
-                elif self.stanGry.tura == Tura.KONIEC:
-                    self.stanGry.aktualnyPionek = None
+                    print("Wybrano pionka")
+                elif(self.stanGry.tura == Tura.BUDUJ):
+                    self.stanGry.aktualnyPionek.wykonajBudowe(x,y, self.stanGry)
+                elif(self.stanGry.tura == Tura.RUCH):
+                    print("Wykonano ruch")
+                    self.stanGry.aktualnyPionek.wykonajRuch(x,y, self.stanGry)
+                if(self.stanGry.tura == Tura.SPRAWDZBUDOWE):
+                    self.stanGry.aktualnyPionek.sprawdzBudowe(self.stanGry)
+                if self.stanGry.aktualnyPionek and self.stanGry.tura == Tura.SPRAWDZRUCH:
+                    print("Sprawdzenie ruchow wybranego pionka")
+                    self.stanGry.aktualnyPionek.sprawdzRuchy(self.stanGry)
+                if self.stanGry.tura == Tura.KONIEC:
                     self.stanGry.aktualnyGracz = self.stanGry.zmienGracza()
-                    self.stanGry.tura = Tura.RUCH
+                    self.stanGry.aktualnyPionek = None
+                    self.stanGry.tura = Tura.SPRAWDZRUCH
         pygame.display.flip()
 
     def draw_text(self, text, size, x, y):

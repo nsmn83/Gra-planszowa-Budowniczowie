@@ -1,12 +1,12 @@
 import pygame
-from enum import Enum
 from gracz import  Gracz
+from tura import Tura
 class stanGry():
     def __init__(self):
         pygame.init()
-        self.tura = None
+        self.tura = Tura.SPRAWDZRUCH
         self.aktualnyPionek = None
-        self.gracze = [Gracz("Pictures/pionek1.png"), Gracz("Pictures/pionek2.png")]
+        self.gracze = [Gracz("Pictures/pionek1.png", 0), Gracz("Pictures/pionek2.png", 1)]
         self.aktualnyGracz = self.gracze[0]
         self.mozliweRuchy = []
         self.mozliweBudowanie = []
@@ -16,6 +16,10 @@ class stanGry():
         self.gracze[1].pionki[0].x, self.gracze[1].pionki[0].y = 3, 3
         self.gracze[1].pionki[1].x, self.gracze[1].pionki[1].y = 4, 4
         self.pola = [[0 for _ in range(5)] for _ in range(5)]
+        self.floor1 = pygame.image.load("Pictures/floor1.png")
+        self.floor2 = pygame.image.load("Pictures/floor2.png")
+        self.floor3 = pygame.image.load("Pictures/floor3.png")
+        self.floor4 = pygame.image.load("Pictures/floor4.png")
 
     def wypiszTure(self):
         print(f"Obecna tura: {self.tura.name}")
@@ -24,14 +28,19 @@ class stanGry():
         indeksGracza = self.gracze.index(self.aktualnyGracz)
         indeksNastepnegoGracza = (indeksGracza + 1) % len(self.gracze)
         self.aktualnyGracz = self.gracze[indeksNastepnegoGracza]
+        print("Obecny gracz: ", self.aktualnyGracz.id)
+        return self.aktualnyGracz
 
     def zerujMozliweAkcje(self):
         self.mozliweRuchy = []
         self.mozliweBudowanie = []
 
     def zwrocPionka(self, x, y):
+        if self.aktualnyGracz is None:
+            print("Brak aktualnego gracza!")
+            return None
         for pionek in self.aktualnyGracz.pionki:
-            if(pionek.x, pionek.y) == (x, y):
+            if (pionek.x, pionek.y) == (x, y):
                 return pionek
         return None
 
@@ -57,6 +66,9 @@ class stanGry():
         for (x, y) in self.mozliweRuchy:
             pygame.draw.rect(surface, (0, 255, 0), pygame.Rect(x * 150, y * 150, 150, 150), 5)
 
+        for (x, y) in self.mozliweBudowanie:
+            pygame.draw.rect(surface, (255, 255, 0), pygame.Rect(x * 150, y * 150, 150, 150), 5)
+
 
     def rysujPionki(self, surface):
         for gracz in self.gracze:
@@ -73,11 +85,3 @@ class stanGry():
     def rysujStanGry(self, surface):
         self.rysuj_plansze(surface)
         self.rysujPionki(surface)
-
-
-
-class Tura(Enum):
-    SPRAWDZRUCH = 1
-    RUCH = 2
-    BUDUJ = 3
-    KONIEC = 4
