@@ -1,6 +1,6 @@
 import pygame
 
-import game
+import gra
 
 class Menu():
     def __init__(self, game):
