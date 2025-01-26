@@ -6,6 +6,8 @@ class Piece():
         self.y = None
         self.img = img
         self.owner = gracz
+        self.moved = False
+        self.build = False
     def drawPiece(self, screen):
         self.img = pygame.transform.scale(self.img, (150, 150))
         screen.blit(self.img, (self.x * 150, self.y * 150))

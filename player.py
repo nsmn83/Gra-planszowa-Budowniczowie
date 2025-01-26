@@ -9,3 +9,6 @@ class Player():
         self.img = img
         self.pieces = [Piece(self, img), Piece(self, img)]
         self.piecesSet = False
+        self.moc = 0
+        if self.id == 1:
+            self.moc = 1

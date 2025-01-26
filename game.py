@@ -1,6 +1,7 @@
 import pygame
 from menu import Menu
 from gameLogic import gameLogic
+from turn import Turn
 
 #klasa wyswietlajaca rozgrywke lub ustawione menu
 class Game():
@@ -39,7 +40,10 @@ class Game():
         while self.playing:
             self.handleClick()
             self.display.fill((0,0,0))
-            self.draw()
+            if self.gameLogic.turn == Turn.ENDOFGAME:
+                self.showWinner()
+            else:
+                self.draw()
 
     def draw(self):
         self.display.blit(self.background, (0, 0))
@@ -55,10 +59,13 @@ class Game():
                 pygame.quit()
                 raise SystemExit
             if event.type == pygame.MOUSEBUTTONDOWN:
-                self.sound.play()
-                #wywolanie funkcji klasy stanGry, oblsugujacej logike gry
-                x, y = self.convertToCords(event.pos)
-                self.gameLogic.handleActions(x, y)
+                if self.board_display.get_rect(topleft=(280, 0)).collidepoint(event.pos):
+                    self.sound.play()
+                    # Wywołanie funkcji klasy gameLogic obsługującej logikę gry
+                    x, y = self.convertToCords(event.pos)
+                    if 0 <= x <= 4 and 0 <= y <= 4:
+                        self.gameLogic.handleActions(x, y)
+
         pygame.display.flip()
 
 
@@ -71,7 +78,11 @@ class Game():
         self.display.blit(text_surface, text_rect)
         return text_rect
 
-
+    def showWinner(self):
+        winner_text = f"Gracz {self.gameLogic.activePlayer.id} wygrał grę"
+        self.draw_text(winner_text, 50, self.width // 2, self.height // 2)
+        self.running = False
+        pygame.display.flip()
 
 
 

@@ -30,46 +30,56 @@ class gameLogic:
 
     #Funkcja do zmiany aktualnego gracza na nastepnego
     def switchPlayer(self):
+        if self.chosenPiece:
+            self.chosenPiece.moved = False
         self.activePlayer = self.players[(self.players.index(self.activePlayer) + 1) % len(self.players)]
+        print("Obecny gracz: ", self.activePlayer.id)
         if self.checkIfBlocked():
             print("Obecny gracz: ", self.activePlayer.id)
         return self.activePlayer
 
     #Pętla oblsugujaca tury graczy
     def handleActions(self, x, y):
-
         # Pierwsza faza gry - rozstawiamy pionki dopoki kazdy nie bedzie mial ich na planszy
         if self.turn == Turn.SETUP:
             self.setup(x, y)
+            return
 
         # Jesli pionek nie jest wybrany, aktywny gracz wybiera swojego pionka
-        elif self.chosenPiece is None:
+        if self.chosenPiece is None:
             self.chosenPiece = self.returnPiece(x, y)
             print(f"Gracz wybrał pionka ({x}, {y})")
 
-        elif (self.turn == Turn.BUILD):
-            self.performBuild(x, y)
-            print(f"Gracz {self.activePlayer.id} zbudowal pietro")
+        elif self.chosenPiece is not None and self.chosenPiece.moved == False:
+            if self.board[x][y].piece and self.board[x][y].piece.owner == self.activePlayer:
+                self.chosenPiece = self.board[x][y].piece
+                self.possibleMoves = []
+                self.turn = Turn.CHECKMOVE
 
-        elif (self.turn == Turn.MOVE):
-            self.performMove(x, y)
-            print(f"Gracz {self.activePlayer.id} wykonal ruch")
+        if self.chosenPiece:
+            if (self.turn == Turn.BUILD):
+                self.performBuild(x, y)
+                print(f"Gracz {self.activePlayer.id} zbudowal pietro")
 
-        if (self.turn == Turn.CHECKBUILD):
-            self.checkBuild()
-            print(f"Gracz {self.activePlayer.id} - sprawdzenie pol pod budowanie")
+            elif (self.turn == Turn.MOVE):
+                self.performMove(x, y)
+                print(f"Gracz {self.activePlayer.id} wykonal ruch")
 
-        if self.chosenPiece and self.turn == Turn.CHECKMOVE:
-            self.checkMoves(self.chosenPiece)
-            print(f"Gracz {self.activePlayer.id} - sprawdzenie pol pod ruch")
+            if (self.turn == Turn.CHECKBUILD):
+                self.checkBuild()
+                print(f"Gracz {self.activePlayer.id} - sprawdzenie pol pod budowanie")
 
-        if self.turn == Turn.ENDOFTURN:
-            print(f"Gracz {self.activePlayer.id} konczy swoja ture")
-            self.chosenPiece = None
-            self.activePlayer = self.switchPlayer()
-            self.turn = Turn.CHECKMOVE
+            if self.chosenPiece and self.turn == Turn.CHECKMOVE:
+                self.checkMoves(self.chosenPiece)
+                print(f"Gracz {self.activePlayer.id} - sprawdzenie pol pod ruch")
 
+            if self.turn == Turn.ENDOFTURN:
+                print(f"Gracz {self.activePlayer.id} konczy swoja ture")
+                self.chosenPiece = None
+                self.activePlayer = self.switchPlayer()
+                self.turn = Turn.CHECKMOVE
 
+            self.checkWinConditions()
 
     # Funkcja służąca ustawieniu pionktów na początku rozgrywki
     def setup(self, x, y):
@@ -120,16 +130,39 @@ class gameLogic:
 
     def changePosition(self, x, y, piece):
         if piece.returnPiecePosition():
-            self.board[piece.x][piece.y].removePiece()
+            self.board[piece.x][piece.y].deletePiece()
         piece.changePiecePosition(x, y)
         self.board[x][y].piece = piece
 
     #Wykoananie ruchu
     def performMove(self, x, y):
-        if (x, y) in self.possibleMoves:
+
+        if self.activePlayer.moc == 1:
+            if (x, y) in self.possibleMoves:
+                xs, ys = self.chosenPiece.returnPiecePosition()
+                self.board[xs][ys].piece = None
+                self.chosenPiece.changePiecePosition(x, y)
+                self.board[x][y].piece = self.chosenPiece
+                self.checkWinConditions()
+                self.possibleMoves = []
+                if(self.chosenPiece.moved == False):
+                    self.chosenPiece.moved = True
+                    self.turn = Turn.CHECKMOVE
+                else:
+                    self.checkWinConditions()
+                    if self.turn != Turn.ENDOFGAME:
+                        self.turn = Turn.CHECKBUILD
+            elif self.chosenPiece.moved == True:
+                    self.checkWinConditions()
+                    if self.turn != Turn.ENDOFGAME:
+                        self.turn = Turn.CHECKBUILD
+
+
+        elif (x, y) in self.possibleMoves:
             xs, ys = self.chosenPiece.returnPiecePosition()
             self.board[xs][ys].piece = None
             self.chosenPiece.changePiecePosition(x, y)
+            self.chosenPiece.moved = True
             self.board[x][y].piece = self.chosenPiece
             self.possibleMoves = []
             self.checkWinConditions()
@@ -137,19 +170,33 @@ class gameLogic:
                 self.turn = Turn.CHECKBUILD
 
     def performBuild(self, x, y):
-        if (x, y) in self.possibleBuildingSites:
+        if self.activePlayer.moc == 1:
+            if (x, y) in self.possibleBuildingSites:
+                self.board[x][y].height += 1
+                self.chosenPiece.build = True
+                self.possibleBuildingSites = [(x,y)]
+            elif self.chosenPiece.build == True:
+                self.possibleBuildingSites = []
+                self.turn = Turn.ENDOFTURN
+                self.chosenPiece.moved = False
+                self.chosenPiece.build = False
+
+        elif (x, y) in self.possibleBuildingSites:
             self.board[x][y].height += 1
             self.possibleBuildingSites = []
             self.turn = Turn.ENDOFTURN
+            self.chosenPiece.moved = False
 
     def checkWinConditions(self):
-        if self.board[self.chosenPiece.x][self.chosenPiece.y].height == 3:
+        if (self.chosenPiece and self.board[self.chosenPiece.x][self.chosenPiece.y].height == 3
+        or len(self.players) == 1):
             print("Gracz ", self.activePlayer.id, " wygrał grę")
             self.turn = Turn.ENDOFGAME
             return
 
     # Na początku tury gracz sprawdza, czy moze wykonac ruch, jesli nie, to jest usuwany z gry
     def checkIfBlocked(self):
+
         if not self.activePlayer.piecesSet:
             return False
         for piece in self.activePlayer.pieces:
@@ -165,11 +212,6 @@ class gameLogic:
             self.board[x][y].deletePiece()
         self.activePlayer = self.players[(self.players.index(self.activePlayer) + 1) % len(self.players)]
         self.players.remove(loser)
-
-        #Sprawdzenie ilu zostalo graczy - jesli 1 - wygrywa on gre
-        if(len(self.players) == 1):
-            print(f"Przeciwnicy odpadli - gratulacje - gracz {self.players[0].id} wygrywa gre")
-            self.turn = Turn.ENDOFGAME
         return True
 
 
