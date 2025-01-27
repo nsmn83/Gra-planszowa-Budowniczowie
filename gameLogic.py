@@ -77,6 +77,7 @@ class gameLogic:
                 print(f"Gracz {self.activePlayer.id} konczy swoja ture")
                 self.chosenPiece = None
                 self.activePlayer = self.switchPlayer()
+                print(f"GRACZ {self.activePlayer.id} ZACZYNA TURE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
                 self.turn = Turn.CHECKMOVE
 
             self.checkWinConditions()
@@ -106,6 +107,8 @@ class gameLogic:
             print("Pionek nie jest jeszcze ustawiony")
             return
         x, y = pos
+        if self.activePlayer.moc.checkMoves(self, piece, pos):
+            return
         valid_moves = filter(
             lambda pos: 0 <= pos[0] < 5 and 0 <= pos[1] < 5 and
                         self.board[pos[0]][pos[1]].height < self.board[x][y].height + 2 and
@@ -125,6 +128,19 @@ class gameLogic:
             [(x + dx, y + dy) for dx in [-1, 0, 1] for dy in [-1, 0, 1] if dx != 0 or dy != 0]
         )
         self.possibleBuildingSites.extend(valid_sites)
+
+        if self.possibleBuildingSites == []:
+            print("Gracz nie moze budowac w swojej turze")
+            loser = self.activePlayer
+            for piece in loser.pieces:
+                x, y = piece.returnPiecePosition()
+                self.board[x][y].deletePiece()
+            self.activePlayer = self.players[(self.players.index(self.activePlayer) + 1) % len(self.players)]
+            self.players.remove(loser)
+            self.chosenPiece = None
+            self.turn = Turn.CHECKMOVE
+            return
+
         self.turn = Turn.BUILD
 
 
@@ -136,29 +152,9 @@ class gameLogic:
 
     #Wykoananie ruchu
     def performMove(self, x, y):
-
-        if self.activePlayer.moc == 1:
-            if (x, y) in self.possibleMoves:
-                xs, ys = self.chosenPiece.returnPiecePosition()
-                self.board[xs][ys].piece = None
-                self.chosenPiece.changePiecePosition(x, y)
-                self.board[x][y].piece = self.chosenPiece
-                self.checkWinConditions()
-                self.possibleMoves = []
-                if(self.chosenPiece.moved == False):
-                    self.chosenPiece.moved = True
-                    self.turn = Turn.CHECKMOVE
-                else:
-                    self.checkWinConditions()
-                    if self.turn != Turn.ENDOFGAME:
-                        self.turn = Turn.CHECKBUILD
-            elif self.chosenPiece.moved == True:
-                    self.checkWinConditions()
-                    if self.turn != Turn.ENDOFGAME:
-                        self.turn = Turn.CHECKBUILD
-
-
-        elif (x, y) in self.possibleMoves:
+        if self.activePlayer.moc.performMove(self, self.chosenPiece, x, y):
+            return
+        if (x, y) in self.possibleMoves:
             xs, ys = self.chosenPiece.returnPiecePosition()
             self.board[xs][ys].piece = None
             self.chosenPiece.changePiecePosition(x, y)
@@ -170,18 +166,9 @@ class gameLogic:
                 self.turn = Turn.CHECKBUILD
 
     def performBuild(self, x, y):
-        if self.activePlayer.moc == 1:
-            if (x, y) in self.possibleBuildingSites:
-                self.board[x][y].height += 1
-                self.chosenPiece.build = True
-                self.possibleBuildingSites = [(x,y)]
-            elif self.chosenPiece.build == True:
-                self.possibleBuildingSites = []
-                self.turn = Turn.ENDOFTURN
-                self.chosenPiece.moved = False
-                self.chosenPiece.build = False
-
-        elif (x, y) in self.possibleBuildingSites:
+        if self.activePlayer.moc.performBuild(self, self.chosenPiece, x, y):
+            return
+        if (x, y) in self.possibleBuildingSites:
             self.board[x][y].height += 1
             self.possibleBuildingSites = []
             self.turn = Turn.ENDOFTURN
@@ -214,7 +201,6 @@ class gameLogic:
         self.players.remove(loser)
         return True
 
-
     def returnPiece(self, x, y):
         if self.activePlayer is None:
             print("Brak aktualnego gracza!")
@@ -235,7 +221,7 @@ class gameLogic:
                 pygame.draw.rect(surface, (0, 0, 0), pygame.Rect(row * 150, col * 150, 150, 150), 1)
                 height = self.board[row][col].height
                 if 1 <= height <=4:
-                    floor_img = pygame.image.load(f"Pictures/floor{height}.png")
+                    floor_img = pygame.image.load(f"Pictures/ptr{height}.png")
                     floor_img = pygame.transform.scale(floor_img, (150, 150))
                     surface.blit(floor_img, (row * 150, col * 150))
 
@@ -244,7 +230,10 @@ class gameLogic:
             pygame.draw.circle(surface, (0, 255, 0, 255), (x*150+75, y*150+75), radius=74, width=5)
 
         for (x, y) in self.possibleBuildingSites:
-            pygame.draw.circle(surface, (255, 255, 0, 255), (x*150+75, y*150+75), radius=74, width=5)
+            color = (255, 255, 0, 255)
+            if(self.chosenPiece.build == True):
+                color = (0,0,255,255)
+            pygame.draw.circle(surface, color, (x*150+75, y*150+75), radius=74, width=5)
 
     def drawPieces(self, surface):
         for player in self.players:

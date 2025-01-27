@@ -45,11 +45,14 @@ class Game():
             else:
                 self.draw()
 
+    #Rysowanie tego co sie dzieje na planszy
     def draw(self):
         self.display.blit(self.background, (0, 0))
         self.board_display.blit(self.board_background, (0, 0))
         self.gameLogic.drawGameState(self.board_display)
         self.display.blit(self.board_display, (280, 0))
+
+        #
 
 
     #funkcja oblsugujaca klikniecia na ekranie gry
@@ -80,6 +83,7 @@ class Game():
 
     def showWinner(self):
         winner_text = f"Gracz {self.gameLogic.activePlayer.id} wygrał grę"
+        self.gameLogic.activePlayer.pieces[0].drawPieceSpecial(self.display, 0, 200)
         self.draw_text(winner_text, 50, self.width // 2, self.height // 2)
         self.running = False
         pygame.display.flip()

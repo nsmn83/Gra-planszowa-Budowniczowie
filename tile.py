@@ -13,3 +13,6 @@ class Tile():
 
     def deletePiece(self):
         self.piece = None
+
+    def returnPiece(self):
+        return self.piece
