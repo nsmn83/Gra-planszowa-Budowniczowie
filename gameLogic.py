@@ -18,7 +18,7 @@ class gameLogic:
     # Dodanie graczy
     def addPlayers(self):
         for element in range(self.numberOfPlayers):
-            img = f"Pictures/player{element+1}.png"
+            img = f"Assets/player{element+1}.png"
             img = pygame.image.load(img)
             player = Player(img, element)
             self.players.append(player)
@@ -57,27 +57,26 @@ class gameLogic:
                 self.turn = Turn.CHECKMOVE
 
         if self.chosenPiece:
-            if (self.turn == Turn.BUILD):
+            if self.turn == Turn.BUILD:
                 self.performBuild(x, y)
                 print(f"Gracz {self.activePlayer.id} zbudowal pietro")
 
-            elif (self.turn == Turn.MOVE):
+            elif self.turn == Turn.MOVE:
                 self.performMove(x, y)
                 print(f"Gracz {self.activePlayer.id} wykonal ruch")
-
-            if (self.turn == Turn.CHECKBUILD):
-                self.checkBuild()
-                print(f"Gracz {self.activePlayer.id} - sprawdzenie pol pod budowanie")
 
             if self.chosenPiece and self.turn == Turn.CHECKMOVE:
                 self.checkMoves(self.chosenPiece)
                 print(f"Gracz {self.activePlayer.id} - sprawdzenie pol pod ruch")
 
+            if self.turn == Turn.CHECKBUILD:
+                self.checkBuild()
+                print(f"Gracz {self.activePlayer.id} - sprawdzenie pol pod budowanie")
+
             if self.turn == Turn.ENDOFTURN:
                 print(f"Gracz {self.activePlayer.id} konczy swoja ture")
                 self.chosenPiece = None
                 self.activePlayer = self.switchPlayer()
-                print(f"GRACZ {self.activePlayer.id} ZACZYNA TURE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
                 self.turn = Turn.CHECKMOVE
 
             self.checkWinConditions()
@@ -221,7 +220,7 @@ class gameLogic:
                 pygame.draw.rect(surface, (0, 0, 0), pygame.Rect(row * 150, col * 150, 150, 150), 1)
                 height = self.board[row][col].height
                 if 1 <= height <=4:
-                    floor_img = pygame.image.load(f"Pictures/ptr{height}.png")
+                    floor_img = pygame.image.load(f"Assets/floor{height}.png")
                     floor_img = pygame.transform.scale(floor_img, (150, 150))
                     surface.blit(floor_img, (row * 150, col * 150))
 

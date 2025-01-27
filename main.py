@@ -1,5 +1,5 @@
 import pygame
-from game import Game
+from gameScreen import Game
 
 game = Game()
 

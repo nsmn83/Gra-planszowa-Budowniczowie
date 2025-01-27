@@ -18,15 +18,17 @@ class Game():
         self.board_height = 750
         self.display = pygame.display.set_mode((self.width, self.height))
         self.board_display = pygame.Surface((self.board_width, self.board_height))
+        self.inProgress = True
 
         #Utworzenie menu głównego wyswietlanego na poczatku gry
         self.menu = Menu(self)
 
         #Elementy - dzwieki, obrazki, czcionki uzywane w oknie gry
         self.font_name = 'Fonts/8-bit Arcade In.ttf'
-        self.sound = pygame.mixer.Sound('Pictures/move.wav')
-        self.background = pygame.transform.scale(pygame.image.load("Pictures/background.jpg"), (1280, 750))
-        self.board_background = pygame.transform.scale(pygame.image.load("Pictures/background5.png"), (1280, 750))
+        self.sound = pygame.mixer.Sound('Assets/move.wav')
+        self.sound_of_win = pygame.mixer.Sound('Assets/win.wav')
+        self.background = pygame.transform.scale(pygame.image.load("Assets/background.jpg"), (1280, 750))
+        self.board_background = pygame.transform.scale(pygame.image.load("Assets/background5.png"), (1280, 750))
         self.gameLogic = gameLogic()
 
     #Zmiana pozycji z pikesli na indeks pola
@@ -51,12 +53,15 @@ class Game():
         self.board_display.blit(self.board_background, (0, 0))
         self.gameLogic.drawGameState(self.board_display)
         self.display.blit(self.board_display, (280, 0))
+        self.drawPlayerInfo()
 
         #
 
 
     #funkcja oblsugujaca klikniecia na ekranie gry
     def handleClick(self):
+        if not self.inProgress:
+            return
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -82,11 +87,28 @@ class Game():
         return text_rect
 
     def showWinner(self):
-        winner_text = f"Gracz {self.gameLogic.activePlayer.id} wygrał grę"
-        self.gameLogic.activePlayer.pieces[0].drawPieceSpecial(self.display, 0, 200)
-        self.draw_text(winner_text, 50, self.width // 2, self.height // 2)
+        self.inProgress = False
+        winner_text = f"Gracz {self.gameLogic.activePlayer.id + 1} wygrał grę"
+        player_head_image = pygame.image.load(f'Assets/player{self.gameLogic.activePlayer.id + 1}_head.png')
+        player_head_image = pygame.transform.scale(player_head_image, (500, 500))
+        self.display.blit(player_head_image, (self.width // 2 - player_head_image.get_width() // 2, 0))
+        self.draw_text(winner_text, 100, self.width // 2, self.height // 2 + 150)
         self.running = False
+        self.resetGame()
         pygame.display.flip()
 
+    def drawPlayerInfo(self):
+        # Pozycja kwadratu w lewym górnym rogu
+        square_x = 20
+        square_y = 20
+        square_width = 250
+        square_height = 450
+        pygame.draw.rect(self.display, (0, 0, 0), (square_x, square_y, square_width, square_height))
+        player_head_image = pygame.image.load(f'Assets/player{self.gameLogic.activePlayer.id + 1}_head.png')
+        player_head_image = pygame.transform.scale(player_head_image, (250, 250))
+        self.display.blit(player_head_image, (square_x, square_y))
 
-
+        player_info_text = f"Gracz {self.gameLogic.activePlayer.id + 1}"
+        self.draw_text(player_info_text, 50, square_x + 125, square_y + 250)
+        player_power_text = f"Moc {self.gameLogic.activePlayer.moc.name}"
+        self.draw_text(player_power_text, 30, square_x + 125, square_y + 350)

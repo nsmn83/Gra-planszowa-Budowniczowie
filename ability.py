@@ -1,8 +1,8 @@
 from turn import Turn
 
 class Ability:
-    def __init__(self, name):
-        self.name = name
+    def __init__(self):
+        self.name = "BRAK"
 
     #Jesli dana moc nie zmienia ruchu, budowania itp, to zwroci False
     def checkMoves(self, gameLogic, piece, pos):
@@ -18,10 +18,11 @@ class Ability:
         return False
 
 class Artemis(Ability):
-    def __init__(self, name):
-        super().__init__(name)
-        self.name = name
+    def __init__(self):
+        super().__init__()
+        self.name = "ARTEMIS"
     def performMove(self, gameLogic, piece, x, y):
+
         if (x, y) in gameLogic.possibleMoves:
             xs, ys = gameLogic.chosenPiece.returnPiecePosition()
             gameLogic.board[xs][ys].piece = None
@@ -55,13 +56,17 @@ class Artemis(Ability):
             gameLogic.possibleMoves.remove(prev_position)
         print(gameLogic.possibleMoves)
 
+        #Jesli gracz sprawdza czy moze wykonac drugi ruch, lecz nie ma na niego miejsca to przechodzi do budowania
+        if gameLogic.possibleMoves == [] and piece.moved:
+            gameLogic.turn = Turn.CHECKBUILD
+            return True
         gameLogic.turn = Turn.MOVE
         return True
 
 class Apollo(Ability):
-    def __init__(self, name):
-        super().__init__(name)
-        self.name = name
+    def __init__(self):
+        super().__init__()
+        self.name = "APOLLO"
 
     def checkMoves(self, gameLogic, piece, pos):
         x, y = pos
@@ -98,9 +103,9 @@ class Apollo(Ability):
                 gameLogic.turn = Turn.CHECKBUILD
 
 class Atlas(Ability):
-    def __init__(self, name):
-        super().__init__(name)
-        self.name = name
+    def __init__(self):
+        super().__init__()
+        self.name = "ATLAS"
 
     def performBuild(self, gameLogic, piece, x, y):
         if (x, y) in gameLogic.possibleBuildingSites and piece.build is False:

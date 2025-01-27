@@ -10,10 +10,9 @@ class Player():
         self.img = img
         self.pieces = [Piece(self, img), Piece(self, img)]
         self.piecesSet = False
-        self.moce = None
-        if self.id == 0:
-            self.moc = Atlas("Atlas")
-        if self.id == 1:
-            self.moc = Artemis("Artemis")
-        if self.id == 2:
-            self.moc = Apollo("Apollo")
+        self.moc = Ability()
+
+    def assingPower(self, moc):
+        self.moc = moc
+
+
