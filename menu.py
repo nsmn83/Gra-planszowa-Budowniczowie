@@ -1,6 +1,6 @@
 import pygame
 from button import Button
-from ability import Ability, Artemis, Apollo, Atlas, Demeter, Hefajstos, Minotaur
+from ability import Ability, Artemis, Apollo, Atlas, Demeter, Hefajstos, Minotaur, Hermes, Faun
 from menuState import MenuState
 
 
@@ -15,9 +15,10 @@ class Menu():
         self.two_player_button = Button('2 GRACZY', self.game.width / 2, 400, self.game.display)
         self.three_player_button = Button('3 GRACZY', self.game.width / 2, 530, self.game.display)
         self.state = MenuState.PLAYERMENU
+        self.sound = pygame.mixer.Sound("Assets/move.wav")
 
         #Przyciski dotyczace ekranu wyboru mocu
-        self.AbilityArray = [Ability(), Artemis(), Apollo(), Atlas(), Demeter(), Hefajstos(), Minotaur()]
+        self.AbilityArray = [Ability(), Artemis(), Apollo(), Atlas(), Demeter(), Hefajstos(), Minotaur(), Hermes(), Faun()]
         self.start_game_button = Button('START', self.game.width / 2, 270, self.game.display)
         self.power_buttons = []
         self.power_indexes = []
@@ -29,6 +30,7 @@ class Menu():
                 pygame.quit()
                 raise SystemExit
             if event.type == pygame.MOUSEBUTTONDOWN:
+                self.sound.play()
                 x,y = event.pos
                 if self.state == MenuState.PLAYERMENU:
                     self.PlayerMenuHandler(x, y)

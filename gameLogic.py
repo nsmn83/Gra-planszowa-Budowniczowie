@@ -16,7 +16,7 @@ class gameLogic:
         self.possibleBuildingSites = []
         self.board = [[Tile() for _ in range(5)] for _ in range(5)]
 
-    #Dodanie graczy
+    # Dodanie graczy
     def addPlayers(self):
         for element in range(self.numberOfPlayers):
             img = f"Assets/player{element + 1}.png"
@@ -25,11 +25,11 @@ class gameLogic:
             self.players.append(player)
         self.activePlayer = self.players[0]
 
-    #Zmiana liczby graczy biorących udzaił w rozgrywce
+    # Zmiana liczby graczy biorących udzaił w rozgrywce
     def setNumOfPlayers(self, numOfPlayers):
         self.numberOfPlayers = numOfPlayers
 
-    #Funkcja do zmiany aktualnego gracza na nastepnego
+    # Funkcja do zmiany aktualnego gracza na nastepnego
     def switchPlayer(self):
         if self.chosenPiece:
             self.chosenPiece.moved = False
@@ -37,7 +37,7 @@ class gameLogic:
         self.checkIfBlocked()
         return self.activePlayer
 
-    #Pętla oblsugujaca tury graczy
+    # Pętla oblsugujaca tury graczy
     def handleActions(self, x, y):
         # Pierwsza faza gry - rozstawiamy pionki dopoki kazdy nie bedzie mial ich na planszy
         if self.turn == Turn.SETUP:
@@ -75,7 +75,7 @@ class gameLogic:
 
             self.checkWinConditions()
 
-    #Funkcja służąca ustawieniu pionktów na początku rozgrywki
+    # Funkcja służąca ustawieniu pionktów na początku rozgrywki
     def setup(self, x, y):
         if self.board[x][y].isBlocked():
             return
@@ -106,7 +106,7 @@ class gameLogic:
         self.possibleMoves.extend(valid_moves)
         self.turn = Turn.MOVE
 
-    #Sprawdzenie mozliwych pol do wykonania budowy
+    # Sprawdzenie mozliwych pol do wykonania budowy
     def checkBuild(self):
         x, y = self.chosenPiece.returnPiecePosition()
         valid_sites = filter(
@@ -117,28 +117,23 @@ class gameLogic:
         )
         self.possibleBuildingSites.extend(valid_sites)
 
-        #Jesli nie mozesz wykonac budowy w swojej turze odpadasz z gry
-        if self.possibleBuildingSites == []:
-            loser = self.activePlayer
-            for piece in loser.pieces:
-                x, y = piece.returnPiecePosition()
-                self.board[x][y].deletePiece()
-            self.activePlayer = self.players[(self.players.index(self.activePlayer) + 1) % len(self.players)]
-            self.players.remove(loser)
+        # Jesli nie mozesz wykonac budowy w swojej turze odpadasz z gry
+        if not self.possibleBuildingSites:
+            self.deleteLoser()
             self.chosenPiece = None
             self.turn = Turn.CHECKMOVE
             return
 
         self.turn = Turn.BUILD
 
-    #Zmiana pozycji poprzec zmiane koordynatow pionka i przypisaniu go odpowiedniemu polu planszy
+    # Zmiana pozycji poprzec zmiane koordynatow pionka i przypisaniu go odpowiedniemu polu planszy
     def changePosition(self, x, y, piece):
         if piece.returnPiecePosition():
             self.board[piece.x][piece.y].deletePiece()
         piece.changePiecePosition(x, y)
         self.board[x][y].piece = piece
 
-    #Wykonanie ruchu
+    # Wykonanie ruchu
     def performMove(self, x, y):
         if self.activePlayer.ability.performMove(self, self.chosenPiece, x, y):
             return
@@ -153,7 +148,7 @@ class gameLogic:
             if self.turn != Turn.ENDOFGAME:
                 self.turn = Turn.CHECKBUILD
 
-    #Budowanie
+    # Budowanie
     def performBuild(self, x, y):
         if self.activePlayer.ability.performBuild(self, self.chosenPiece, x, y):
             return
@@ -163,14 +158,14 @@ class gameLogic:
             self.turn = Turn.ENDOFTURN
             self.chosenPiece.moved = False
 
-    #Sprawdzenie czy czy gracz w swoim ruchu wszedl na 3 pietro lub czy pozostali odpadli
+    # Sprawdzenie czy czy gracz w swoim ruchu wszedl na 3 pietro lub czy pozostali odpadli
     def checkWinConditions(self):
-        if (self.chosenPiece and self.chosenPiece.moved and self.board[self.chosenPiece.x][self.chosenPiece.y].height == 3
-                or len(self.players) == 1):
+        if self.activePlayer.ability.checkWinCondition(self) or self.chosenPiece and self.chosenPiece.moved and \
+                self.board[self.chosenPiece.x][
+                    self.chosenPiece.y].height == 3 or len(self.players) == 1:
             self.turn = Turn.ENDOFGAME
-            return
 
-    #Na początku tury gracz sprawdza, czy moze wykonac ruch, jesli nie, to jest usuwany z gry
+    # Na początku tury gracz sprawdza, czy moze wykonac ruch, jesli nie, to jest usuwany z gry
     def checkIfBlocked(self):
 
         if not self.activePlayer.piecesSet:
@@ -180,7 +175,18 @@ class gameLogic:
         if self.possibleMoves:
             self.possibleMoves = []
             return False
+        self.deleteLoser()
 
+    # Funkcja zwracajaca pionka jesli
+    def returnPiece(self, x, y):
+        if self.activePlayer is None:
+            return None
+        if self.board[x][y].piece and self.board[x][y].piece.owner == self.activePlayer:
+            return self.board[x][y].piece
+        return None
+
+    # Usuniecie gracza z rozgrywki
+    def deleteLoser(self):
         loser = self.activePlayer
         for piece in loser.pieces:
             x, y = piece.returnPiecePosition()
@@ -189,15 +195,7 @@ class gameLogic:
         self.players.remove(loser)
         return True
 
-    #Funkcja zwracajaca pionka jesli
-    def returnPiece(self, x, y):
-        if self.activePlayer is None:
-            return None
-        if self.board[x][y].piece and self.board.piece.owner == self.activePlayer:
-            return self.board[x][y].piece
-        return None
-
-    #Funkcja rysujaca plansze, pionki i mozliwe ruchy
+    # Funkcja rysujaca plansze, pionki i mozliwe ruchy
     def drawGameState(self, surface):
         self.drawBoard(surface)
         self.drawPieces(surface)
@@ -219,7 +217,7 @@ class gameLogic:
 
         for (x, y) in self.possibleBuildingSites:
             color = (255, 255, 0, 255)
-            if (self.chosenPiece.build == True):
+            if self.chosenPiece.build:
                 color = (0, 0, 255, 255)
             pygame.draw.circle(surface, color, (x * 150 + 75, y * 150 + 75), radius=74, width=5)
 

@@ -27,7 +27,6 @@ class Game():
         #Elementy - dzwieki, obrazki, czcionki uzywane w oknie gry
         self.font_name = 'Fonts/8-bit Arcade In.ttf'
         self.sound = pygame.mixer.Sound('Assets/move.wav')
-        self.sound_of_win = pygame.mixer.Sound('Assets/win.wav')
         self.background = pygame.transform.scale(pygame.image.load("Assets/background.jpg"), (1280, 750))
         self.board_background = pygame.transform.scale(pygame.image.load("Assets/background5.png"), (1280, 750))
         self.gameLogic = gameLogic()
@@ -43,18 +42,7 @@ class Game():
         while self.playing:
             self.handleClick()
             self.display.fill((0,0,0))
-            if self.gameLogic.turn == Turn.ENDOFGAME:
-                self.showWinner()
-            else:
-                self.draw()
-
-    #Rysowanie tego co sie dzieje na planszy
-    def draw(self):
-        self.display.blit(self.background, (0, 0))
-        self.board_display.blit(self.board_background, (0, 0))
-        self.gameLogic.drawGameState(self.board_display)
-        self.display.blit(self.board_display, (280, 0))
-        self.drawPlayerInfo()
+            self.draw()
 
 
     #Funkcja oblsugujaca klikniecia na ekranie gry
@@ -113,6 +101,17 @@ class Game():
         self.draw_text(player_power_text, 30, square_x + 125, square_y + 300)
         player_instruction = self.gameLogic.activePlayer.ability.rule
         self.display.blit(player_instruction, (50, 350))
+
+    #Rysowanie tego co sie dzieje na planszy
+    def draw(self):
+        if self.gameLogic.turn == Turn.ENDOFGAME:
+            self.showWinner()
+            return
+        self.display.blit(self.background, (0, 0))
+        self.board_display.blit(self.board_background, (0, 0))
+        self.gameLogic.drawGameState(self.board_display)
+        self.display.blit(self.board_display, (280, 0))
+        self.drawPlayerInfo()
 
     #Reset stanu gry i przejscie do menu głównego
     def comeBackToMenu(self):

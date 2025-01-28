@@ -13,10 +13,10 @@ class Ability:
     def checkMoves(self, gameLogic, piece, pos):
         return False
 
-    def checkBuild(self, gameLogic, piece, x, y):
+    def performMove(self, gameLogic, piece, x, y):
         return False
 
-    def performMove(self, gameLogic, piece, x, y):
+    def checkWinCondition(self, gameLogic):
         return False
 
     def performBuild(self, gameLogic, piece, x, y):
@@ -29,11 +29,12 @@ class Artemis(Ability):
         self.name = "ARTEMIS"
         self.rule = pygame.image.load("Assets/artemis_opis.jpg")
 
+    #Wykonanie ruchu ze sprawdzeniem czy jest to pierwszy czy drugi ruch
     def performMove(self, gameLogic, piece, x, y):
 
         if (x, y) in gameLogic.possibleMoves:
             xs, ys = gameLogic.chosenPiece.returnPiecePosition()
-            gameLogic.board[xs][ys].piece = None
+            gameLogic.board[xs][ys].deletePiece()
             gameLogic.chosenPiece.changePiecePosition(x, y)
             gameLogic.board[x][y].piece = gameLogic.chosenPiece
             gameLogic.checkWinConditions()
@@ -64,7 +65,7 @@ class Artemis(Ability):
             gameLogic.possibleMoves.remove(prev_position)
 
         # Jesli gracz sprawdza czy moze wykonac drugi ruch, lecz nie ma na niego miejsca to przechodzi do budowania
-        if gameLogic.possibleMoves == [] and piece.moved:
+        if not gameLogic.possibleMoves and piece.moved:
             gameLogic.turn = Turn.CHECKBUILD
             return True
         gameLogic.turn = Turn.MOVE
@@ -228,3 +229,43 @@ class Minotaur(Ability):
             if gameLogic.turn != Turn.ENDOFGAME:
                 gameLogic.possibleMoves = []
                 gameLogic.turn = Turn.CHECKBUILD
+
+class Hermes(Ability):
+    def __init__(self):
+        super().__init__()
+        self.name = "Hermes"
+        self.rule = pygame.image.load("Assets/hermes_opis.jpg")
+
+    def checkMoves(self, gameLogic, piece, pos):
+        x, y = pos
+        valid_moves = []
+        change = [1, 0, -1]
+        height = gameLogic.board[x][y].height
+        for dx in change:
+            for dy in change:
+                tempX, tempY = x + dx, y + dy
+                if dx == 0 and dy == 0:
+                    continue
+                while 0 <= tempX <= 4 and 0 <= tempY <= 4:
+                    if gameLogic.board[tempX][tempY].height != height or gameLogic.board[tempX][tempY].piece:
+                        break
+                    valid_moves.append((tempX, tempY))
+                    tempX += dx
+                    tempY += dy
+
+        gameLogic.possibleMoves.extend(valid_moves)
+        gameLogic.turn = Turn.MOVE
+        return False
+
+class Faun(Ability):
+    def __init__(self):
+        super().__init__()
+        self.name = "Faun"
+        self.rule = pygame.image.load("Assets/faun_opis.jpg")
+
+    def checkWinCondition(self, gameLogic):
+        if gameLogic.chosenPiece and gameLogic.chosenPiece.moved:
+            piece = gameLogic.chosenPiece
+            if gameLogic.board[piece.prevX][piece.prevY].height - gameLogic.board[piece.x][piece.y].height >= 2:
+                return True
+        return False
