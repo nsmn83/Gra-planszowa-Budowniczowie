@@ -34,3 +34,5 @@ W grz występuje 6 mocy specjalnych, modyfikujących rozgrywkę. Są to:
 4. DEMETER: Gracz możę w fazie budowania postawić dwa bloki, jednak nie mogą być one na tym samym polu.
 5. HEFAJSTOS: Gracz może postawić dwa bloki na tym samym polu, chyba że drugi blok byłby kopułą.
 6. MINOTAUR: Gracz może wejść na pole zajęte przez przeciwnika, przepychając go zgodnie z kierunkiem ruchu. Ruch możliwy do wykonania jedynie jeśli kolejne pole za przeciwnikiem jest niezajęte i nie ma na nim kopuły.
+7. HERMES: Jeśli twój pionek nie zmienia wysokości może przesunąć się o dowolną liczbę pól w wybranym kierunku.
+8. FAUN: Zyskujesz możliwość wygrania poprzez przemieszczenie się o minimum dwa pola w dół.
