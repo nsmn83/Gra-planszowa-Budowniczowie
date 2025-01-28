@@ -1,6 +1,6 @@
 import pygame
 from button import Button
-from ability import Ability, Artemis, Apollo, Atlas
+from ability import Ability, Artemis, Apollo, Atlas, Demeter, Hefajstos, Minotaur
 from menuState import MenuState
 
 
@@ -12,12 +12,12 @@ class Menu():
         self.game = game
         self.background = pygame.transform.scale(pygame.image.load("Assets/background.jpg"), (1280, 750))
         self.start_button = Button('START', self.game.width / 2, 270, self.game.display)
-        self.two_player_button = Button('2 GRACZY', self.game.width / 2, 470, self.game.display)
-        self.three_player_button = Button('3 GRACZY', self.game.width / 2, 670, self.game.display)
+        self.two_player_button = Button('2 GRACZY', self.game.width / 2, 400, self.game.display)
+        self.three_player_button = Button('3 GRACZY', self.game.width / 2, 530, self.game.display)
         self.state = MenuState.PLAYERMENU
 
         #Przyciski dotyczace ekranu wyboru mocu
-        self.AbilityArray = [Ability(), Artemis(), Apollo(), Atlas()]
+        self.AbilityArray = [Ability(), Artemis(), Apollo(), Atlas(), Demeter(), Hefajstos(), Minotaur()]
         self.start_game_button = Button('START', self.game.width / 2, 270, self.game.display)
         self.power_buttons = []
         self.power_indexes = []
@@ -66,7 +66,9 @@ class Menu():
             for index, player in enumerate(self.game.gameLogic.players):
                 power = self.AbilityArray[self.power_indexes[index]]
                 player.assingPower(power)
-                self.startGame()
+            self.startGame()
+            self.power_buttons = []
+            self.power_indexes = []
 
         #Zmiana mocy przez gracza
         for index, button in enumerate(self.power_buttons):
@@ -86,7 +88,6 @@ class Menu():
 
     #Rozpoczecie gry - wylaczenie menu, wyswietlania menu, wlaczenie petli gry
     def startGame(self):
-        self.game.menu = None
         self.run_display = False
         self.game.playing = True
 

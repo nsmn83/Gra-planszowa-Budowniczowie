@@ -2,8 +2,9 @@ import pygame
 from menu import Menu
 from gameLogic import gameLogic
 from turn import Turn
+from menuState import MenuState
 
-#klasa wyswietlajaca rozgrywke lub ustawione menu
+#Klasa wyswietlajaca rozgrywke lub ustawione menu
 class Game():
     def __init__(self):
         pygame.init()
@@ -55,10 +56,8 @@ class Game():
         self.display.blit(self.board_display, (280, 0))
         self.drawPlayerInfo()
 
-        #
 
-
-    #funkcja oblsugujaca klikniecia na ekranie gry
+    #Funkcja oblsugujaca klikniecia na ekranie gry
     def handleClick(self):
         if not self.inProgress:
             return
@@ -67,17 +66,18 @@ class Game():
                 pygame.quit()
                 raise SystemExit
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if self.board_display.get_rect(topleft=(280, 0)).collidepoint(event.pos):
+                if self.gameLogic.turn == Turn.ENDOFGAME:
+                    self.comeBackToMenu()
+                elif self.board_display.get_rect(topleft=(280, 0)).collidepoint(event.pos):
                     self.sound.play()
                     # Wywołanie funkcji klasy gameLogic obsługującej logikę gry
                     x, y = self.convertToCords(event.pos)
                     if 0 <= x <= 4 and 0 <= y <= 4:
                         self.gameLogic.handleActions(x, y)
-
         pygame.display.flip()
 
 
-    #funkcja rysujaca tekst na ekranie
+    #Funkcja rysujaca tekst na ekranie
     def draw_text(self, text, size, x, y):
         font = pygame.font.Font(self.font_name, size)
         text_surface = font.render(text, True, (255,255,255))
@@ -86,23 +86,22 @@ class Game():
         self.display.blit(text_surface, text_rect)
         return text_rect
 
+    #Wypisanie zwycięzcy na ekran
     def showWinner(self):
-        self.inProgress = False
         winner_text = f"Gracz {self.gameLogic.activePlayer.id + 1} wygrał grę"
         player_head_image = pygame.image.load(f'Assets/player{self.gameLogic.activePlayer.id + 1}_head.png')
         player_head_image = pygame.transform.scale(player_head_image, (500, 500))
+        self.display.fill((0, 0, 0))
         self.display.blit(player_head_image, (self.width // 2 - player_head_image.get_width() // 2, 0))
         self.draw_text(winner_text, 100, self.width // 2, self.height // 2 + 150)
-        self.running = False
-        self.resetGame()
         pygame.display.flip()
 
+    #Rysowanie kwadratu z informacją odnośnie aktywnego Gracza
     def drawPlayerInfo(self):
-        # Pozycja kwadratu w lewym górnym rogu
         square_x = 20
         square_y = 20
         square_width = 250
-        square_height = 450
+        square_height = 550
         pygame.draw.rect(self.display, (0, 0, 0), (square_x, square_y, square_width, square_height))
         player_head_image = pygame.image.load(f'Assets/player{self.gameLogic.activePlayer.id + 1}_head.png')
         player_head_image = pygame.transform.scale(player_head_image, (250, 250))
@@ -110,5 +109,14 @@ class Game():
 
         player_info_text = f"Gracz {self.gameLogic.activePlayer.id + 1}"
         self.draw_text(player_info_text, 50, square_x + 125, square_y + 250)
-        player_power_text = f"Moc {self.gameLogic.activePlayer.moc.name}"
-        self.draw_text(player_power_text, 30, square_x + 125, square_y + 350)
+        player_power_text = f"Moc {self.gameLogic.activePlayer.ability.name}"
+        self.draw_text(player_power_text, 30, square_x + 125, square_y + 300)
+        player_instruction = self.gameLogic.activePlayer.ability.rule
+        self.display.blit(player_instruction, (50, 350))
+
+    #Reset stanu gry i przejscie do menu głównego
+    def comeBackToMenu(self):
+        self.playing = False
+        self.menu.state = MenuState.PLAYERMENU
+        self.gameLogic = gameLogic()
+        self.menu.display_menu()

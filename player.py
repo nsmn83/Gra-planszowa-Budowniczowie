@@ -1,6 +1,6 @@
 import pygame
 from piece import Piece
-from ability import Ability, Artemis, Apollo, Atlas
+from ability import Ability
 
 class Player():
     def __init__(self, img, id):
@@ -10,9 +10,9 @@ class Player():
         self.img = img
         self.pieces = [Piece(self, img), Piece(self, img)]
         self.piecesSet = False
-        self.moc = Ability()
+        self.ability = Ability()
 
-    def assingPower(self, moc):
-        self.moc = moc
+    def assingPower(self, ability):
+        self.ability = ability
 
 

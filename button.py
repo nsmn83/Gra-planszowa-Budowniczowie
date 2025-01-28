@@ -9,7 +9,7 @@ class Button():
         self.screen = screen
         self.width = 400
         self.height = 100
-        self.button_offset = 30
+        self.button_offset = 100
         self.font_size = font_size
         self.font = pygame.font.Font('Fonts/8-bit Arcade In.ttf', font_size)
         self.button_text = self.font.render(self.text, True, 'white')
