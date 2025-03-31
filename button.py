@@ -2,7 +2,7 @@ import pygame
 pygame.font.init()
 
 class Button():
-    def __init__(self, text, x, y, screen, font_size = 80):
+    def __init__(self, text: str, x: int, y: int, screen, font_size: int = 80):
         self.x = x
         self.y = y
         self.text = text

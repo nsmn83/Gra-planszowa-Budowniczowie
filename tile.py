@@ -6,13 +6,13 @@ class Tile():
         self.piece = None
         self.height = 0
 
-    def isBlocked(self):
-        if(self.piece):
+    def is_blocked(self):
+        if self.piece:
             return True
         return False
 
-    def deletePiece(self):
+    def delete_piece(self):
         self.piece = None
 
-    def returnPiece(self):
+    def return_piece(self):
         return self.piece

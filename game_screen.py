@@ -1,8 +1,8 @@
 import pygame
 from menu import Menu
-from gameLogic import gameLogic
+from game_logic import gameLogic
 from turn import Turn
-from menuState import MenuState
+from menu_state import MenuState
 
 #Klasa wyswietlajaca rozgrywke lub ustawione menu
 class Game():
@@ -19,7 +19,7 @@ class Game():
         self.board_height = 750
         self.display = pygame.display.set_mode((self.width, self.height))
         self.board_display = pygame.Surface((self.board_width, self.board_height))
-        self.inProgress = True
+        self.in_progress = True
 
         #Utworzenie menu głównego wyswietlanego na poczatku gry
         self.menu = Menu(self)
@@ -29,10 +29,10 @@ class Game():
         self.sound = pygame.mixer.Sound('Assets/move.wav')
         self.background = pygame.transform.scale(pygame.image.load("Assets/background.jpg"), (1280, 750))
         self.board_background = pygame.transform.scale(pygame.image.load("Assets/background5.png"), (1280, 750))
-        self.gameLogic = gameLogic()
+        self.game_logic = gameLogic()
 
     #Zmiana pozycji z pikesli na indeks pola
-    def convertToCords(self, pos):
+    def convert_to_cords(self, pos):
         x, y = pos
         x -= 280 # Przesunięcie pola gry względem okna
         return int(x/150), int(y/150)
@@ -40,28 +40,28 @@ class Game():
     #Petla gry
     def game_loop(self):
         while self.playing:
-            self.handleClick()
+            self.handle_click()
             self.display.fill((0,0,0))
             self.draw()
 
 
     #Funkcja oblsugujaca klikniecia na ekranie gry
-    def handleClick(self):
-        if not self.inProgress:
+    def handle_click(self):
+        if not self.in_progress:
             return
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 raise SystemExit
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if self.gameLogic.turn == Turn.ENDOFGAME:
-                    self.comeBackToMenu()
+                if self.game_logic.turn == Turn.ENDOFGAME:
+                    self.come_back_to_menu()
                 elif self.board_display.get_rect(topleft=(280, 0)).collidepoint(event.pos):
                     self.sound.play()
-                    # Wywołanie funkcji klasy gameLogic obsługującej logikę gry
-                    x, y = self.convertToCords(event.pos)
+                    # Wywołanie funkcji klasy game_logic obsługującej logikę gry
+                    x, y = self.convert_to_cords(event.pos)
                     if 0 <= x <= 4 and 0 <= y <= 4:
-                        self.gameLogic.handleActions(x, y)
+                        self.game_logic.handle_actions(x, y)
         pygame.display.flip()
 
 
@@ -75,9 +75,9 @@ class Game():
         return text_rect
 
     #Wypisanie zwycięzcy na ekran
-    def showWinner(self):
-        winner_text = f"Gracz {self.gameLogic.activePlayer.id + 1} wygrał grę"
-        player_head_image = pygame.image.load(f'Assets/player{self.gameLogic.activePlayer.id + 1}_head.png')
+    def show_winner(self):
+        winner_text = f"Gracz {self.game_logic.active_player.id + 1} wygrał grę"
+        player_head_image = pygame.image.load(f'Assets/player{self.game_logic.active_player.id + 1}_head.png')
         player_head_image = pygame.transform.scale(player_head_image, (500, 500))
         self.display.fill((0, 0, 0))
         self.display.blit(player_head_image, (self.width // 2 - player_head_image.get_width() // 2, 0))
@@ -85,37 +85,37 @@ class Game():
         pygame.display.flip()
 
     #Rysowanie kwadratu z informacją odnośnie aktywnego Gracza
-    def drawPlayerInfo(self):
+    def draw_player_info(self):
         square_x = 20
         square_y = 20
         square_width = 250
         square_height = 550
         pygame.draw.rect(self.display, (0, 0, 0), (square_x, square_y, square_width, square_height))
-        player_head_image = pygame.image.load(f'Assets/player{self.gameLogic.activePlayer.id + 1}_head.png')
+        player_head_image = pygame.image.load(f'Assets/player{self.game_logic.active_player.id + 1}_head.png')
         player_head_image = pygame.transform.scale(player_head_image, (250, 250))
         self.display.blit(player_head_image, (square_x, square_y))
 
-        player_info_text = f"Gracz {self.gameLogic.activePlayer.id + 1}"
+        player_info_text = f"Gracz {self.game_logic.active_player.id + 1}"
         self.draw_text(player_info_text, 50, square_x + 125, square_y + 250)
-        player_power_text = f"Moc {self.gameLogic.activePlayer.ability.name}"
+        player_power_text = f"Moc {self.game_logic.active_player.ability.name}"
         self.draw_text(player_power_text, 30, square_x + 125, square_y + 300)
-        player_instruction = self.gameLogic.activePlayer.ability.rule
+        player_instruction = self.game_logic.active_player.ability.rule
         self.display.blit(player_instruction, (50, 350))
 
     #Rysowanie tego co sie dzieje na planszy
     def draw(self):
-        if self.gameLogic.turn == Turn.ENDOFGAME:
-            self.showWinner()
+        if self.game_logic.turn == Turn.ENDOFGAME:
+            self.show_winner()
             return
         self.display.blit(self.background, (0, 0))
         self.board_display.blit(self.board_background, (0, 0))
-        self.gameLogic.drawGameState(self.board_display)
+        self.game_logic.draw_game_state(self.board_display)
         self.display.blit(self.board_display, (280, 0))
-        self.drawPlayerInfo()
+        self.draw_player_info()
 
     #Reset stanu gry i przejscie do menu głównego
-    def comeBackToMenu(self):
+    def come_back_to_menu(self):
         self.playing = False
         self.menu.state = MenuState.PLAYERMENU
-        self.gameLogic = gameLogic()
+        self.game_logic = gameLogic()
         self.menu.display_menu()
