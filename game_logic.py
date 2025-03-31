@@ -1,5 +1,6 @@
 import pygame
 from player import Player
+from piece import Piece
 from turn import Turn
 from tile import Tile
 
@@ -16,6 +17,14 @@ class gameLogic:
         self.possibleBuildingSites = []
         self.board = [[Tile() for _ in range(5)] for _ in range(5)]
 
+        #Budowle
+        self.images = [
+            pygame.transform.scale(pygame.image.load("Assets/floor1.png"), (150, 150)),
+            pygame.transform.scale(pygame.image.load("Assets/floor2.png"), (150, 150)),
+            pygame.transform.scale(pygame.image.load("Assets/floor3.png"), (150, 150)),
+            pygame.transform.scale(pygame.image.load("Assets/floor4.png"), (150, 150))
+        ]
+
     # Dodanie graczy
     def addPlayers(self):
         for element in range(self.numberOfPlayers):
@@ -26,7 +35,7 @@ class gameLogic:
         self.activePlayer = self.players[0]
 
     # Zmiana liczby graczy biorących udzaił w rozgrywce
-    def setNumOfPlayers(self, numOfPlayers):
+    def setNumOfPlayers(self, numOfPlayers: int) -> None:
         self.numberOfPlayers = numOfPlayers
 
     # Funkcja do zmiany aktualnego gracza na nastepnego
@@ -38,7 +47,7 @@ class gameLogic:
         return self.activePlayer
 
     # Pętla oblsugujaca tury graczy
-    def handleActions(self, x, y):
+    def handleActions(self, x: int, y: int):
         # Pierwsza faza gry - rozstawiamy pionki dopoki kazdy nie bedzie mial ich na planszy
         if self.turn == Turn.SETUP:
             self.setup(x, y)
@@ -48,9 +57,9 @@ class gameLogic:
         if self.chosenPiece is None:
             self.chosenPiece = self.returnPiece(x, y)
 
-        elif self.chosenPiece is not None and self.chosenPiece.moved == False:
-            if self.board[x][y].piece and self.board[x][y].piece.owner == self.activePlayer:
-                self.chosenPiece = self.board[x][y].piece
+        elif self.chosenPiece is not None and not self.chosenPiece.moved:
+            if self.board[x][y].returnPiece() and self.board[x][y].piece.owner == self.activePlayer:
+                self.chosenPiece = self.board[x][y].returnPiece()
                 self.possibleMoves = []
                 self.turn = Turn.CHECKMOVE
 
@@ -76,7 +85,7 @@ class gameLogic:
             self.checkWinConditions()
 
     # Funkcja służąca ustawieniu pionktów na początku rozgrywki
-    def setup(self, x, y):
+    def setup(self, x: int, y: int):
         if self.board[x][y].isBlocked():
             return
         for piece in self.activePlayer.pieces:
@@ -90,32 +99,32 @@ class gameLogic:
                 return
 
     # Sprawdzenie mozliwych pol do wykonania ruchu
-    def checkMoves(self, piece):
+    def checkMoves(self, piece: Piece):
         pos = piece.returnPiecePosition()
         if pos is None:
             return
         if self.activePlayer.ability.checkMoves(self, piece, pos):
             return
         x, y = pos
-        valid_moves = filter(
+        valid = filter(
             lambda pos: 0 <= pos[0] < 5 and 0 <= pos[1] < 5 and
                         self.board[pos[0]][pos[1]].height < self.board[x][y].height + 2 and
                         self.board[pos[0]][pos[1]].piece is None,
             [(x + dx, y + dy) for dx in [-1, 0, 1] for dy in [-1, 0, 1] if dx != 0 or dy != 0]
         )
-        self.possibleMoves.extend(valid_moves)
+        self.possibleMoves.extend(valid)
         self.turn = Turn.MOVE
 
     # Sprawdzenie mozliwych pol do wykonania budowy
     def checkBuild(self):
         x, y = self.chosenPiece.returnPiecePosition()
-        valid_sites = filter(
+        valid = filter(
             lambda pos: 0 <= pos[0] < 5 and 0 <= pos[1] < 5 and
                         self.board[pos[0]][pos[1]].height < 4 and
                         self.board[pos[0]][pos[1]].piece is None,
             [(x + dx, y + dy) for dx in [-1, 0, 1] for dy in [-1, 0, 1] if dx != 0 or dy != 0]
         )
-        self.possibleBuildingSites.extend(valid_sites)
+        self.possibleBuildingSites.extend(valid)
 
         # Jesli nie mozesz wykonac budowy w swojej turze odpadasz z gry
         if not self.possibleBuildingSites:
@@ -127,14 +136,14 @@ class gameLogic:
         self.turn = Turn.BUILD
 
     # Zmiana pozycji poprzec zmiane koordynatow pionka i przypisaniu go odpowiedniemu polu planszy
-    def changePosition(self, x, y, piece):
+    def changePosition(self, x: int, y: int, piece: Piece):
         if piece.returnPiecePosition():
             self.board[piece.x][piece.y].deletePiece()
         piece.changePiecePosition(x, y)
         self.board[x][y].piece = piece
 
     # Wykonanie ruchu
-    def performMove(self, x, y):
+    def performMove(self, x: int, y: int):
         if self.activePlayer.ability.performMove(self, self.chosenPiece, x, y):
             return
         if (x, y) in self.possibleMoves:
@@ -149,7 +158,7 @@ class gameLogic:
                 self.turn = Turn.CHECKBUILD
 
     # Budowanie
-    def performBuild(self, x, y):
+    def performBuild(self, x: int, y: int):
         if self.activePlayer.ability.performBuild(self, self.chosenPiece, x, y):
             return
         elif (x, y) in self.possibleBuildingSites:
@@ -178,7 +187,7 @@ class gameLogic:
         self.deleteLoser()
 
     # Funkcja zwracajaca pionka jesli
-    def returnPiece(self, x, y):
+    def returnPiece(self, x: int, y: int):
         if self.activePlayer is None:
             return None
         if self.board[x][y].piece and self.board[x][y].piece.owner == self.activePlayer:
@@ -196,22 +205,20 @@ class gameLogic:
         return True
 
     # Funkcja rysujaca plansze, pionki i mozliwe ruchy
-    def drawGameState(self, surface):
+    def drawGameState(self, surface: pygame.surface):
         self.drawBoard(surface)
         self.drawPieces(surface)
         self.drawMoves(surface)
 
-    def drawBoard(self, surface):
+    def drawBoard(self, surface: pygame.surface):
         for row in range(0, 5):
             for col in range(0, 5):
                 pygame.draw.rect(surface, (0, 0, 0), pygame.Rect(row * 150, col * 150, 150, 150), 1)
                 height = self.board[row][col].height
                 if 1 <= height <= 4:
-                    floor_img = pygame.image.load(f"Assets/floor{height}.png")
-                    floor_img = pygame.transform.scale(floor_img, (150, 150))
-                    surface.blit(floor_img, (row * 150, col * 150))
+                    surface.blit(self.images[height - 1], (row * 150, col * 150))
 
-    def drawMoves(self, surface):
+    def drawMoves(self, surface: pygame.surface):
         for (x, y) in self.possibleMoves:
             pygame.draw.circle(surface, (0, 255, 0, 255), (x * 150 + 75, y * 150 + 75), radius=74, width=5)
 
@@ -221,7 +228,7 @@ class gameLogic:
                 color = (0, 0, 255, 255)
             pygame.draw.circle(surface, color, (x * 150 + 75, y * 150 + 75), radius=74, width=5)
 
-    def drawPieces(self, surface):
+    def drawPieces(self, surface: pygame.surface):
         for player in self.players:
             for piece in player.pieces:
                 if piece.returnPiecePosition():

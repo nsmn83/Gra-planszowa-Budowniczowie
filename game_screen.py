@@ -66,7 +66,7 @@ class Game():
 
 
     #Funkcja rysujaca tekst na ekranie
-    def draw_text(self, text, size, x, y):
+    def draw_text(self, text: str, size: int, x: int, y: int):
         font = pygame.font.Font(self.font_name, size)
         text_surface = font.render(text, True, (255,255,255))
         text_rect = text_surface.get_rect()
