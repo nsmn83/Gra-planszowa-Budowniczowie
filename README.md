@@ -11,6 +11,7 @@ PRZYGOTOWANIE DO GRY:
 1. W menu należy wybrać liczbę graczy biorących udział w rozgrywce (opcją podstawową jest 2 graczy).
 2. Każdy z graczy wybiera jedną z dostępnyc mocy (opcją podstawową jest brak mocy specjalnych).
 3. Każdy z graczy ustawia po 2 pionki na planszy
+ ![Wybor mocy](ScreenShots/power_menu.jpg)
 
 ROZGRYWKA
 
@@ -29,7 +30,7 @@ Gra toczy się dopóki, któryś z graczy nie wejdzie w fazie ruchu na 3 piętro
 
 MOCE SPECJALNE
 
-W grz występuje 6 mocy specjalnych, modyfikujących rozgrywkę. Są to:
+W grze występuje 6 mocy specjalnych, modyfikujących rozgrywkę. Są to:
 
 1. DWUSKOK: Gracz może wykonać dwa ruchy (drugi ruch opcjonalny), jednak nie może wrócić na pole, z którego startował.
 2. WOJOWNIK: Gracz może wykonać ruch na pole zajęte przez przeciwnika, pionki zamieniają się wtedy miejscami.
