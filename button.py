@@ -7,7 +7,7 @@ class Button():
         self.y = y
         self.text = text
         self.screen = screen
-        self.width = 400
+        self.width = 600
         self.height = 100
         self.button_offset = 100
         self.font_size = font_size

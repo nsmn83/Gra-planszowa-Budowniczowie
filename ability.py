@@ -23,11 +23,11 @@ class Ability:
         return False
 
 
-class Artemis(Ability):
+class Dwuskok(Ability):
     def __init__(self):
         super().__init__()
-        self.name = "ARTEMIS"
-        self.rule = pygame.image.load("Assets/artemis_opis.jpg")
+        self.name = "DWUSKOK"
+        self.rule = pygame.image.load("Assets/dwuskok_opis.jpg")
 
     #Wykonanie ruchu ze sprawdzeniem czy jest to pierwszy czy drugi ruch
     def perform_move(self, game_logic, piece, x: int, y: int):
@@ -72,11 +72,11 @@ class Artemis(Ability):
         return True
 
 
-class Apollo(Ability):
+class Wojownik(Ability):
     def __init__(self):
         super().__init__()
-        self.name = "APOLLO"
-        self.rule = pygame.image.load("Assets/apollo_opis.jpg")
+        self.name = "WOJOWNIK"
+        self.rule = pygame.image.load("Assets/wojownik_opis.jpg")
 
     def check_moves(self, game_logic, piece, pos: tuple):
         x, y = pos
@@ -109,11 +109,11 @@ class Apollo(Ability):
                 game_logic.turn = Turn.CHECKBUILD
 
 
-class Atlas(Ability):
+class Oszust(Ability):
     def __init__(self):
         super().__init__()
-        self.name = "ATLAS"
-        self.rule = pygame.image.load("Assets/atlas_opis.jpg")
+        self.name = "OSZUST"
+        self.rule = pygame.image.load("Assets/oszust_opis.jpg")
 
     def perform_build(self, game_logic, piece, x: int, y: int):
         if (x, y) in game_logic.possible_building_sites and piece.build is False:
@@ -133,11 +133,11 @@ class Atlas(Ability):
             piece.build = True
 
 
-class Demeter(Ability):
+class Deweloper(Ability):
     def __init__(self):
         super().__init__()
-        self.name = "DEMETER"
-        self.rule = pygame.image.load("Assets/demeter_opis.jpg")
+        self.name = "DEWELOPER"
+        self.rule = pygame.image.load("Assets/deweloper_opis.jpg")
 
     def perform_build(self, game_logic, piece, x: int, y: int):
         if (x, y) in game_logic.possible_building_sites and not piece.build:
@@ -153,11 +153,11 @@ class Demeter(Ability):
             game_logic.chosen_piece.moved = False
 
 
-class Hefajstos(Ability):
+class Wysokosciowiec(Ability):
     def __init__(self):
         super().__init__()
-        self.name = "HEFAJSTOS"
-        self.rule = pygame.image.load("Assets/hefajstos_opis.jpg")
+        self.name = "WYSOKOŚCIOWIEC"
+        self.rule = pygame.image.load("Assets/wysokosciowiec_opis.jpg")
 
     def perform_build(self, game_logic, piece, x: int, y: int):
         if (x, y) in game_logic.possible_building_sites and not piece.build:
@@ -179,11 +179,11 @@ class Hefajstos(Ability):
         return True
 
 
-class Minotaur(Ability):
+class Spychacz(Ability):
     def __init__(self):
         super().__init__()
-        self.name = "MINOTAUR"
-        self.rule = pygame.image.load("Assets/minotaur_opis.jpg")
+        self.name = "SPYCHACZ"
+        self.rule = pygame.image.load("Assets/spychacz_opis.jpg")
 
     def check_moves(self, game_logic, piece, pos: tuple):
         x, y = pos
@@ -230,11 +230,11 @@ class Minotaur(Ability):
                 game_logic.possible_moves = []
                 game_logic.turn = Turn.CHECKBUILD
 
-class Hermes(Ability):
+class Pospieszny(Ability):
     def __init__(self):
         super().__init__()
-        self.name = "Hermes"
-        self.rule = pygame.image.load("Assets/hermes_opis.jpg")
+        self.name = "POŚPIESZNY"
+        self.rule = pygame.image.load("Assets/pospieszny.jpg")
 
     def check_moves(self, game_logic, piece, pos: tuple):
         x, y = pos
@@ -257,11 +257,11 @@ class Hermes(Ability):
         game_logic.turn = Turn.MOVE
         return False
 
-class Faun(Ability):
+class Skoczek(Ability):
     def __init__(self):
         super().__init__()
-        self.name = "Faun"
-        self.rule = pygame.image.load("Assets/faun_opis.jpg")
+        self.name = "SKOCZEK"
+        self.rule = pygame.image.load("Assets/skoczek_opis.jpg")
 
     def check_win_condition(self, game_logic):
         if game_logic.chosen_piece and game_logic.chosen_piece.moved:

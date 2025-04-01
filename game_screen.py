@@ -28,7 +28,7 @@ class Game():
         self.font_name = 'Fonts/8-bit Arcade In.ttf'
         self.sound = pygame.mixer.Sound('Assets/move.wav')
         self.background = pygame.transform.scale(pygame.image.load("Assets/background.jpg"), (1280, 750))
-        self.board_background = pygame.transform.scale(pygame.image.load("Assets/background5.png"), (1280, 750))
+        self.board_background = pygame.transform.scale(pygame.image.load("Assets/ground.png"), (1280, 750))
         self.game_logic = gameLogic()
 
     #Zmiana pozycji z pikesli na indeks pola

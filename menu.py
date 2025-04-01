@@ -1,6 +1,6 @@
 import pygame
 from button import Button
-from ability import Ability, Artemis, Apollo, Atlas, Demeter, Hefajstos, Minotaur, Hermes, Faun
+from ability import Ability, Deweloper, Dwuskok, Oszust, Pospieszny, Skoczek, Spychacz, Wojownik, Wysokosciowiec
 from menu_state import MenuState
 
 
@@ -17,8 +17,7 @@ class Menu():
         self.sound = pygame.mixer.Sound("Assets/move.wav")
 
         # Przyciski dotyczace ekranu wyboru mocu
-        self.AbilityArray = [Ability(), Artemis(), Apollo(), Atlas(), Demeter(), Hefajstos(), Minotaur(), Hermes(),
-                             Faun()]
+        self.AbilityArray = [Ability(), Deweloper(), Dwuskok(), Oszust(), Pospieszny(), Skoczek(), Spychacz(), Wojownik(), Wysokosciowiec()]
         self.start_game_button = Button('START', self.game.width / 2, 270, self.game.display)
         self.power_buttons = []
         self.power_indexes = []
@@ -93,15 +92,15 @@ class Menu():
 
     # Rysowanie menu
     def draw_menu_background(self):
-        background_surface = pygame.Surface((750, 750))
+        background_surface = pygame.Surface((1180, 750))
         background_surface.fill((0, 0, 0))
         background_surface.set_alpha(200)
-        self.game.display.blit(background_surface, (280, 0))
+        self.game.display.blit(background_surface, (50, 0))
         if self.state == MenuState.PLAYERMENU:
             self.start_button.draw()
             self.two_player_button.draw()
             self.three_player_button.draw()
-            self.game.draw_text('ISLANDS', 150, self.game.width / 2, 70)
+            self.game.draw_text('BUDOWNICZOWIE', 150, self.game.width / 2, 70)
         elif self.state == MenuState.POWERMENU:
             self.start_game_button.draw()
             for button in self.power_buttons:
