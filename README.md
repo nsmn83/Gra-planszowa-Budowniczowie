@@ -25,7 +25,7 @@ Gracze wykonują naprzemiennie swoje tury, każda tura składa się z:
 Gra toczy się dopóki, któryś z graczy nie wejdzie w fazie ruchu na 3 piętro, lub inny gracze nie odpadną z gry. Odpaść można, jeśli w skutek działań przeciwnika lub własnych błędów:
 
 1. Żaden z pionków gracza nie może wykonać ruchu w jego turze.
-2. Ruszony pionek nie może wybudować budowli
+2. Ruszony pionek nie może wybudować budowli.
  ![Wygrana gracza](ScreenShots/game_over.jpg)
 
 MOCE SPECJALNE
